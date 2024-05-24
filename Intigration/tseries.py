@@ -69,15 +69,17 @@ def get_tseries(sim, args):
         except rebound.Collision:
             #if not stable after intigration jump, just ends simulation
             stable = False
+            #returns list of objects and whether or not stable after short intigration
             return triotseries, stable
 
         
         
         for tr, trio in enumerate(trios):
-            #populates data
+            #populates data for each trio
             triotseries[tr].populateData( sim, trio, get_pairs(sim,trio), minP,i)
     
     stable = True
+    #returns list of objects and whether or not stable after short intigration
     return triotseries, stable
 
 

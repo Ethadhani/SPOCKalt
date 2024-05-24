@@ -4,7 +4,7 @@ class Trio:
     def __init__(self):
         '''initializes new set of features.
         
-            each list of the key is the series of data points
+            each list of the key is the series of data points, second dict is for final features
         
         '''
     #innitialize running list
@@ -45,15 +45,22 @@ class Trio:
 
 
     def fillVal(self, Nout):
-        '''fills with nan values'''
+        '''fills with nan values
+        
+            Arguments: 
+                Nout: number of datasets collected'''
         for each in self.runningList.keys():
             self.runningList[each] = [np.nan]*Nout
 
     def getNum(self):
-        '''returns number of features'''
+        '''returns number of features collected as ran'''
         return len(self.runningList.keys())
 
     def populateData(self, sim, trio, pairs, minP,i):
+        '''populates the runningList data dictionary for one time step.
+        
+            user must specify how each is calculated and added
+        '''
         ps = sim.particles
         for q, [label, i1, i2] in enumerate(pairs):
             m1 = ps[i1].m
@@ -71,6 +78,7 @@ class Trio:
 
 
     def startingFeatures(self, sim, pairs):
+        '''used to initialize/add to the features that only depend on initial conditions'''
         
         #only applies to one
         ps  = sim.particles
@@ -78,6 +86,10 @@ class Trio:
             self.features['EMcross'+label] =  (ps[i2].a-ps[i1].a)/ps[i1].a
 
     def fill_features(self, args):
+        '''fills the final set of features that are returned to the ML model.
+            
+            Each feature is filled depending on some combination of runningList features and initial condition features
+        '''
         Norbits = args[0]
         Nout = args[1]
         trios = args[2]
