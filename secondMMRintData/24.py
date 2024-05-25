@@ -13,6 +13,9 @@ from collections import OrderedDict
 #from feature_functions import features
 #from additional_feature_functions import additional_features
 
+start = 115000
+end = 120000
+
 col = ['p0m','p0x','p0y','p0z','p0vx','p0vy','p0vz','p1m','p1x','p1y','p1z','p1vx','p1vy','p1vz','p2m','p2x','p2y','p2z','p2vx','p2vy','p2vz','p3m','p3x','p3y','p3z','p3vx','p3vy','p3vz']
 
 path = '../'
@@ -48,16 +51,17 @@ from simsetup import *
 from featureKlassifier import *
 
 
+
 featureData = pd.DataFrame()
-start = 115000
-end = 120000
+
+spock = FeatureClassifier()
 for x in range(start,end,1):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         sim = simsetup.get_sim(x,InitialData)
-        simData = simToData(sim)
+        simData = spock.simToData(sim)
     temp = pd.DataFrame.from_dict(simData[0][0], orient="index").T
-    temp.loc[:,'prelimStable']=simData[1]
+    temp.loc[:,'prelimStable']=simData[0][1]
     temp.loc[:,'Stable']=InitialData['Stable'].iloc[x]
     temp.loc[:,'index']=x
     featureData = pd.concat([featureData,temp], sort=False, ignore_index=True)

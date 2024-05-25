@@ -71,8 +71,9 @@ class Trio:
             self.runningList['EM'+label][i]= np.sqrt((e2x-e1x)**2 + (e2y-e1y)**2)
             self.runningList['EP'+label][i] = np.sqrt((m1*e1x + m2*e2x)**2 + (m1*e1y + m2*e2y)**2)/(m1+m2)
             MMRs = find_strongest_MMR(sim, i1, i2)
+            #print(MMR)
             self.runningList['MMRstrength'+label][i] = MMRs[2]
-            self.runningList['MMRstrength'+label][i] = MMRs[5]
+            self.runningList['twoMMRstrength'+label][i] = MMRs[5]
 
         self.runningList['MEGNO'][i]= sim.megno() # megno
 
@@ -100,8 +101,8 @@ class Trio:
 
         self.features['MMRstrengthnear']= np.median(self.runningList['MMRstrengthnear'])
         self.features['MMRstrengthfar']= np.median(self.runningList['MMRstrengthfar'])
-        self.features['twoMMRstrengthnear']= np.median(self.runningList['MMRstrengthnear'])
-        self.features['twoMMRstrengthfar']= np.median(self.runningList['MMRstrengthnear'])
+        self.features['twoMMRstrengthnear']= np.median(self.runningList['twoMMRstrengthnear'])
+        self.features['twoMMRstrengthfar']= np.median(self.runningList['twoMMRstrengthfar'])
 
         self.features['EMfracstdnear']= np.std(self.runningList['EMnear'])/ self.features['EMcrossnear']
         self.features['EMfracstdfar']= np.std(self.runningList['EMfar'])/ self.features['EMcrossfar']
@@ -187,7 +188,7 @@ def find_strongest_MMR(sim, i1, i2):
 
     minperiodratio = max(Pratio-delta, 0.)
     maxperiodratio = min(Pratio+delta, 0.99) # too many resonances close to 1
-    res = resonant_period_ratios(minperiodratio,maxperiodratio, order=2)
+    res = resonant_period_ratios(minperiodratio,maxperiodratio, order=maxorder)
 
     # Calculating EM exactly would have to be done in celmech for each j/k res below, and would slow things down. This is good enough for approx expression
     EM = np.sqrt((ps[i1].e*np.cos(ps[i1].pomega) - ps[i2].e*np.cos(ps[i2].pomega))**2 + (ps[i1].e*np.sin(ps[i1].pomega) - ps[i2].e*np.sin(ps[i2].pomega))**2)
@@ -209,7 +210,7 @@ def find_strongest_MMR(sim, i1, i2):
                 j,j2 = swap(j,j2)
                 k,k2 = swap(k,k2)
                 maxstrength, maxstrength2 = swap(maxstrength, maxstrength2)
-    #print(maxstrength)
+    #print(f'max:{maxstrength} two:{maxstrength2}')
 
     # if maxstrength == 0:
     #     maxstrength = np.nan
