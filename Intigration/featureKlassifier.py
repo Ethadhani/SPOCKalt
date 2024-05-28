@@ -29,7 +29,7 @@ class FeatureClassifier:
             if s[1]==False:
                 results.append(False)
             else:
-                results.append(self.model.predict(pd.DataFrame.from_dict(s[0], orient="index").T)[0])
+                results.append(self.model.predict(pd.DataFrame.from_dict(s[0], orient="index").T))
 
         return results
     
