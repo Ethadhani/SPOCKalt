@@ -3,7 +3,7 @@ import numpy as np
 from collections import OrderedDict
 import warnings
 import pandas as pd
-from features import Trio
+from Intigration import features
 
 global featureCount
 featureCount = 10
@@ -49,14 +49,14 @@ def get_tseries(sim, args):
     times = np.linspace(0, Norbits*minP, Nout) #list of times to intigrate to
 
     #triopairs = []
-    triotseries: list[Trio] =[]
+    triotseries: list[features.Trio] =[]
     #forms the list that will later consist of each trio pair, and the tseries for each list
 
     for tr, trio in enumerate(trios): # For each trio there are two adjacent pairs 
         #fills triopairs with each pair, and fills triotseries with the Trio class 
         #eachpair = get_pairs(sim, trio)
         #triopairs.append(eachpair)
-        triotseries.append(Trio())
+        triotseries.append(features.Trio())
         triotseries[tr].fillVal(Nout)
         triotseries[tr].startingFeatures(sim, get_pairs(sim,trio)) #puts in the valeus that depend on initial cond
         #triotseries will be a list of the objects that have all the data and Trio

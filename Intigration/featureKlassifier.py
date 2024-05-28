@@ -1,6 +1,9 @@
-from features import *
-from tseries import *
-from simsetup import *
+# from features import *
+# from tseries import *
+# from simsetup import *
+from Intigration import features
+from Intigration import simsetup
+from Intigration import tseries
 import sys
 import pandas as pd
 import numpy as np
@@ -29,7 +32,7 @@ class FeatureClassifier:
             if s[1]==False:
                 results.append(False)
             else:
-                results.append(self.model.predict(pd.DataFrame.from_dict(s[0], orient="index").T))
+                results.append(self.model.predict(pd.DataFrame.from_dict(s[0], orient="index").T)[0])
 
         return results
     
@@ -60,7 +63,7 @@ class FeatureClassifier:
         results = [] #results of the intigrations for each, if only one simulation return will not be in a list
         for s in sim:
             s = s.copy() #creates a copy as to not alter simulation
-            init_sim_parameters(s) #initializes the simulation
+            simsetup.init_sim_parameters(s) #initializes the simulation
             self.check_errors(s) #checks for errors
             trios = [[j,j+1,j+2] for j in range(1,s.N_real-2)] # list of adjacent trios   
             featureargs = [Norbits, Nout, trios] #featureargs is: [number of orbits, number of stops, set of trios]
@@ -80,7 +83,7 @@ class FeatureClassifier:
         
         '''
 
-        triotseries, stable = get_tseries(sim, args) #runs the intigration on the simulation, and returns the filled objects for each trio and short stability
+        triotseries, stable = tseries.get_tseries(sim, args) #runs the intigration on the simulation, and returns the filled objects for each trio and short stability
         #calculate final vals
 
         #original
