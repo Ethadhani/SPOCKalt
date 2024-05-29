@@ -7,22 +7,27 @@ class Trio:
             each list of the key is the series of data points, second dict is for final features
         
         '''
-    #innitialize running list
+    #innitialize running list 
+    #delete all outers
         self.runningList = OrderedDict()
         self.runningList['time']=[] #must keep time
         self.runningList['EMnear']=[]
         self.runningList['EPnear']=[]
         self.runningList['EMfar']=[]
         self.runningList['EPfar']=[]
+        self.runningList['EMouter']=[]
+        self.runningList['EPouter']=[]
         self.runningList['MMRstrengthfar']=[]
         self.runningList['MMRstrengthnear']=[]
+        self.runningList['MMRstrengthouter']=[]
         self.runningList['twoMMRstrengthfar']=[]
         self.runningList['twoMMRstrengthnear']=[]
+        self.runningList['twoMMRstrengthouter']=[]
         self.runningList['MEGNO']=[]
 
 
     #innitialize final values
-
+    #delete all outers
         self.features = OrderedDict()
         self.features['EMcrossnear']= np.nan
         self.features['EMfracstdnear']= np.nan
@@ -34,6 +39,11 @@ class Trio:
         self.features['EPstdfar']= np.nan
         self.features['MMRstrengthfar']= np.nan
         self.features['twoMMRstrengthfar']= np.nan
+        self.features['EMcrossouter']= np.nan
+        self.features['EMfracstdouter']= np.nan
+        self.features['EPstdouter']= np.nan
+        self.features['MMRstrengthouter']= np.nan
+        self.features['twoMMRstrengthouter']= np.nan
         self.features['MEGNO']= np.nan
         self.features['MEGNOstd']= np.nan
 
@@ -62,7 +72,9 @@ class Trio:
             user must specify how each is calculated and added
         '''
         ps = sim.particles
+        #print(pairs)
         for q, [label, i1, i2] in enumerate(pairs):
+            #print(q)
             m1 = ps[i1].m
             m2 = ps[i2].m
             e1x, e1y = ps[i1].e*np.cos(ps[i1].pomega), ps[i1].e*np.sin(ps[i1].pomega)
@@ -70,8 +82,8 @@ class Trio:
             self.runningList['time'][i]= sim.t/minP
             self.runningList['EM'+label][i]= np.sqrt((e2x-e1x)**2 + (e2y-e1y)**2)
             self.runningList['EP'+label][i] = np.sqrt((m1*e1x + m2*e2x)**2 + (m1*e1y + m2*e2y)**2)/(m1+m2)
+            #print([label, i1, i2])
             MMRs = find_strongest_MMR(sim, i1, i2)
-            #print(MMR)
             self.runningList['MMRstrength'+label][i] = MMRs[2]
             self.runningList['twoMMRstrength'+label][i] = MMRs[5]
 
@@ -93,21 +105,32 @@ class Trio:
         '''
         Norbits = args[0]
         Nout = args[1]
-        trios = args[2]
+        trios = args[2] #
+        #print(args)
 
         if not np.isnan(self.runningList['MEGNO']).any(): # no nans
             self.features['MEGNO']= np.median(self.runningList['MEGNO'][-int(Nout/10):]) # smooth last 10% to remove oscillations around 2
             self.features['MEGNOstd']= np.std(self.runningList['MEGNO'][int(Nout/5):])
 
-        self.features['MMRstrengthnear']= np.median(self.runningList['MMRstrengthnear'])
-        self.features['MMRstrengthfar']= np.median(self.runningList['MMRstrengthfar'])
-        self.features['twoMMRstrengthnear']= np.median(self.runningList['twoMMRstrengthnear'])
-        self.features['twoMMRstrengthfar']= np.median(self.runningList['twoMMRstrengthfar'])
 
-        self.features['EMfracstdnear']= np.std(self.runningList['EMnear'])/ self.features['EMcrossnear']
-        self.features['EMfracstdfar']= np.std(self.runningList['EMfar'])/ self.features['EMcrossfar']
-        self.features['EPstdnear']= np.std(self.runningList['EPnear'])
-        self.features['EPstdfar']= np.std(self.runningList['EPfar'])
+        for label in ['near', 'far', 'outer']: #would need to remove outer here
+            self.features['MMRstrength'+label] = np.median(self.runningList['MMRstrength'+label])
+            self.features['twoMMRstrength'+label]= np.median(self.runningList['twoMMRstrength'+label])
+            self.features['EMfracstd'+label]= np.std(self.runningList['EM'+label])/ self.features['EMcross'+label]
+            self.features['EPstd'+label]= np.std(self.runningList['EP'+label])
+
+
+
+
+        # self.features['MMRstrengthnear']= np.median(self.runningList['MMRstrengthnear'])
+        # self.features['MMRstrengthfar']= np.median(self.runningList['MMRstrengthfar'])
+        # self.features['twoMMRstrengthnear']= np.median(self.runningList['twoMMRstrengthnear'])
+        # self.features['twoMMRstrengthfar']= np.median(self.runningList['twoMMRstrengthfar'])
+
+        # self.features['EMfracstdnear']= np.std(self.runningList['EMnear'])/ self.features['EMcrossnear']
+        # self.features['EMfracstdfar']= np.std(self.runningList['EMfar'])/ self.features['EMcrossfar']
+        # self.features['EPstdnear']= np.std(self.runningList['EPnear'])
+        # self.features['EPstdfar']= np.std(self.runningList['EPfar'])
        
         
     
@@ -186,7 +209,7 @@ def find_strongest_MMR(sim, i1, i2):
 
     delta = 0.03
     if Pratio < 0 or Pratio > 1: # n < 0 = hyperbolic orbit, Pratio > 1 = orbits are crossing
-        return np.nan, np.nan, np.nan
+        return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
     minperiodratio = max(Pratio-delta, 0.)
     maxperiodratio = min(Pratio+delta, 0.99) # too many resonances close to 1
@@ -204,7 +227,8 @@ def find_strongest_MMR(sim, i1, i2):
             s = np.inf # still want to identify as strongest MMR if initial condition is exatly b*n2-a*n1 = 0
         else:
             s = np.abs(np.sqrt(m1+m2)*(EM/EMcross)**((b-a)/2.)/nres)
-        if s > maxstrength2:
+        
+        if s > maxstrength2 and not np.isnan(s) :
             j2 = b
             k2 = b-a
             maxstrength2 = s
@@ -212,7 +236,7 @@ def find_strongest_MMR(sim, i1, i2):
                 j,j2 = swap(j,j2)
                 k,k2 = swap(k,k2)
                 maxstrength, maxstrength2 = swap(maxstrength, maxstrength2)
-    #print(f'max:{maxstrength} two:{maxstrength2}')
+    
 
     # if maxstrength == 0:
     #     maxstrength = np.nan

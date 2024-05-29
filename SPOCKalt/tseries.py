@@ -9,23 +9,25 @@ global featureCount
 featureCount = 10
 
 def get_pairs(sim, trio):
-    '''returns the two pairs of the given trio.
+    '''returns the three pairs of the given trio.
     
     Arguments:
         sim: simulation in question
         trio: indicies of the three particles in question, formated as [p1,p2,p3]
     return:
         return: returns the two pairs in question, formated as [[near pair, index, index], [far pair, index, index]]'''
+    #print(trio)
     ps = sim.particles
     sortedindices = sorted(trio, key=lambda i: ps[i].a) # sort from inner to outer
     EMcrossInner = (ps[sortedindices[1]].a-ps[sortedindices[0]].a)/ps[sortedindices[0]].a
     EMcrossOuter = (ps[sortedindices[2]].a-ps[sortedindices[1]].a)/ps[sortedindices[1]].a
     #not sure why sorted based on EMcrossInner for near and far but is
+    #remove outer parts
 
     if EMcrossInner < EMcrossOuter:
-        return [['near', sortedindices[0], sortedindices[1]], ['far', sortedindices[1], sortedindices[2]]]
+        return [['near', sortedindices[0], sortedindices[1]], ['far', sortedindices[1], sortedindices[2]], ['outer', sortedindices[0], sortedindices[2]]]
     else:
-        return [['near', sortedindices[1], sortedindices[2]], ['far', sortedindices[0], sortedindices[1]]]
+        return [['near', sortedindices[1], sortedindices[2]], ['far', sortedindices[0], sortedindices[1]], ['outer', sortedindices[0], sortedindices[2]]]
     
 
 
@@ -37,7 +39,7 @@ def get_tseries(sim, args):
         args: arguments in format [number of orbits, number of data collections equally spaced, list of trios]'''
     Norbits = args[0] #number of orbits
     Nout = args[1] #number of data collection
-    trios = args[2] #list of trios
+    trios = args[2] #list of each planet set trio
 
     #a10s = [sim.particles[trio[0]].a for trio in trios] #collects a list of the closest particle in each trio
     minP = np.min([p.P for p in sim.particles[1:sim.N_real]])
@@ -51,13 +53,14 @@ def get_tseries(sim, args):
     #triopairs = []
     triotseries: list[features.Trio] =[]
     #forms the list that will later consist of each trio pair, and the tseries for each list
-
+    #print(trios)
     for tr, trio in enumerate(trios): # For each trio there are two adjacent pairs 
         #fills triopairs with each pair, and fills triotseries with the Trio class 
         #eachpair = get_pairs(sim, trio)
         #triopairs.append(eachpair)
         triotseries.append(features.Trio())
         triotseries[tr].fillVal(Nout)
+        #print(trio)
         triotseries[tr].startingFeatures(sim, get_pairs(sim,trio)) #puts in the valeus that depend on initial cond
         #triotseries will be a list of the objects that have all the data and Trio
     
@@ -76,6 +79,7 @@ def get_tseries(sim, args):
         
         for tr, trio in enumerate(trios):
             #populates data for each trio
+            #print(trio)
             triotseries[tr].populateData( sim, trio, get_pairs(sim,trio), minP,i)
     
     stable = True

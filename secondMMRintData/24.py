@@ -14,7 +14,7 @@ from collections import OrderedDict
 #from additional_feature_functions import additional_features
 
 start = 115000
-end = 120000
+end = start+5000
 
 col = ['p0m','p0x','p0y','p0z','p0vx','p0vy','p0vz','p1m','p1x','p1y','p1z','p1vx','p1vy','p1vz','p2m','p2x','p2y','p2z','p2vx','p2vy','p2vz','p3m','p3x','p3y','p3z','p3vx','p3vy','p3vz']
 
@@ -38,23 +38,24 @@ InitialData = pd.concat([InitialDataRand, InitialDataRes])
 
 sys.path.insert(1, '..')
 #print(path)
-from Intigration import *
-sys.path.insert(1, '../Intigration')
+from SPOCKalt import *
+sys.path.insert(1, '../SPOCKalt')
 #Intigration/simsetup.py
-from Intigration import simsetup
-from Intigration import features
-from Intigration import tseries
+from SPOCKalt import featureKlassifier
+from SPOCKalt import simsetup
+# from Intigration import features
+# from Intigration import tseries
 
-from Intigration import featureKlassifier
+# from Intigration import featureKlassifier
 
-from simsetup import *
-from featureKlassifier import *
+# from simsetup import *
+# from featureKlassifier import *
 
 
 
 featureData = pd.DataFrame()
 
-spock = FeatureClassifier()
+spock = featureKlassifier.FeatureClassifier()
 for x in range(start,end,1):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -66,5 +67,5 @@ for x in range(start,end,1):
     temp.loc[:,'index']=x
     featureData = pd.concat([featureData,temp], sort=False, ignore_index=True)
 featureData = featureData.set_index('index')
-featureData.to_csv('2MMR'+str(start)+'To'+str(end)+'.csv')
+featureData.to_csv('2MMR'+str(start)+'To'+str(end)+'Outer.csv')
  
