@@ -1,9 +1,9 @@
 # from features import *
 # from tseries import *
 # from simsetup import *
-from Intigration import features
-from Intigration import simsetup
-from Intigration import tseries
+from SPOCKalt import features
+from SPOCKalt import simsetup
+from SPOCKalt import tseries
 import sys
 import pandas as pd
 import numpy as np
@@ -32,7 +32,7 @@ class FeatureClassifier:
             if s[1]==False:
                 results.append(False)
             else:
-                results.append(self.model.predict(pd.DataFrame.from_dict(s[0], orient="index").T)[0])
+                results.append(self.model.predict(pd.DataFrame.from_dict(s[0], orient="index").T)[0]) #does not predict a probability, predicts t/f
 
         return results
     

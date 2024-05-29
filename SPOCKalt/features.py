@@ -172,6 +172,7 @@ def resonant_period_ratios(min_per_ratio,max_per_ratio,order):
 #taken from original spock
 ####################################################
 def find_strongest_MMR(sim, i1, i2):
+    
     maxorder = 2
     ps = sim.particles
     n1 = ps[i1].n
@@ -181,6 +182,7 @@ def find_strongest_MMR(sim, i1, i2):
     m2 = ps[i2].m/ps[0].m
 
     Pratio = n2/n1
+    #next want to try not to abreviate to closest
 
     delta = 0.03
     if Pratio < 0 or Pratio > 1: # n < 0 = hyperbolic orbit, Pratio > 1 = orbits are crossing
