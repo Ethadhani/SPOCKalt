@@ -195,8 +195,8 @@ def resonant_period_ratios(min_per_ratio,max_per_ratio,order):
 #taken from original spock
 ####################################################
 def find_strongest_MMR(sim, i1, i2):
-    
-    maxorder = 2
+    #originally 2, trying with 5th order now
+    maxorder = 5
     ps = sim.particles
     n1 = ps[i1].n
     n2 = ps[i2].n
