@@ -41,7 +41,7 @@ class FeatureClassifier:
         return self.simToData(sim)
 
 
-
+    
     def simToData(self, sim):
         '''given a simulation, or list of simulations, returns data required for spock clasification.
         
@@ -71,7 +71,7 @@ class FeatureClassifier:
             results.append(self.runSim(s,featureargs)) #adds data to results. calls runSim helper function which returns the data list for sim
         
         return results
-
+    
     def runSim(self, sim, args):
         '''returns the data list of features for a given simulation
             

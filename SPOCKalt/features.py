@@ -88,6 +88,26 @@ class Trio:
             self.runningList['twoMMRstrength'+label][i] = MMRs[5]
 
         self.runningList['MEGNO'][i]= sim.megno() # megno
+    
+
+    def threeBROrder(self, sim, trio):
+        '''' returns order of 3BR present at time between trio
+        
+        Arguments:
+        sim: simulation in question
+        trio: indicies of the three particles in question, formated as [p1,p2,p3]'''
+
+        #calculates frequencys
+        [i1, i2, i3] = trio
+        ps = sim.particles
+        i1f = 2*np.pi /ps[i1].P
+        i2f = 2*np.pi /ps[i2].P
+        i3f = 2*np.pi/ ps[i3].P
+        
+
+
+        return
+
 
 
     def startingFeatures(self, sim, pairs):

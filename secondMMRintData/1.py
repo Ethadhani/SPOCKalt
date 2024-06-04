@@ -64,6 +64,8 @@ for x in range(start,end,1):
     temp = pd.DataFrame.from_dict(simData[0][0], orient="index").T
     temp.loc[:,'prelimStable']=simData[0][1]
     temp.loc[:,'Stable']=InitialData['Stable'].iloc[x]
+    temp.loc[:,'instability_time']=InitialData['instability_time'].iloc[x]
+    temp.loc[:,'shadow_instability_time']=InitialData['shadow_instability_time'].iloc[x]
     temp.loc[:,'index']=x
     featureData = pd.concat([featureData,temp], sort=False, ignore_index=True)
 featureData = featureData.set_index('index')
