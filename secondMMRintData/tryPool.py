@@ -45,6 +45,7 @@ spock = featureKlassifier.FeatureClassifier()
 
 def initialize(dataset):
     datalist = []
+    #dataset.shape[0]
     for row in range(dataset.shape[0]):
         data = {'Stable': [InitialData['Stable'].iloc[row]],
                 'instability_time': [InitialData['instability_time'].iloc[row]],
@@ -92,7 +93,7 @@ if __name__ == "__main__":  # confirms that the code is under main function
         new = list(p.map(runInt, datalist))
     # test = list(map(runInt, bound))
     # print(test)
-    sheetname = 'FirstPoolTest'
+    sheetname = 'maxWidthIntTest'
     #print(bound)
     pd.concat(new).to_csv(sheetname+'.csv')
     new = pd.read_csv(sheetname+'.csv').set_index('index').sort_index()

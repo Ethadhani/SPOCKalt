@@ -64,16 +64,17 @@ def get_tseries(sim, args):
         triotseries[tr].startingFeatures(sim, get_pairs(sim,trio)) #puts in the valeus that depend on initial cond
         #triotseries will be a list of the objects that have all the data and Trio
     
-
+    fail = False
     for i, time in enumerate(times):
         #intigrates each step and collects required data
         try:
             sim.integrate(time, exact_finish_time=0)
         except rebound.Collision:
             #if not stable after intigration jump, just ends simulation
-            stable = False
+            fail = True
             #returns list of objects and whether or not stable after short intigration
-            return triotseries, stable
+            #return triotseries, stable
+            break
 
         
         
@@ -82,7 +83,11 @@ def get_tseries(sim, args):
             #print(trio)
             triotseries[tr].populateData( sim, trio, get_pairs(sim,trio), minP,i)
     
-    stable = True
+    if fail == False:
+        stable = True
+    else: 
+        stable = False
+        fail = False
     #returns list of objects and whether or not stable after short intigration
     return triotseries, stable
 
