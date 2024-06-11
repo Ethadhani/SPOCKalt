@@ -68,7 +68,7 @@ def runInt (set):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         sim = simsetup.get_simList(row)
-        simData = spock.simToData(sim)
+        simData = spock.simToData(sim, True)
         temp = pd.DataFrame.from_dict(simData[0][0], orient="index").T
     temp.loc[:,'prelimStable']=simData[0][1]
     temp = pd.DataFrame.join(temp,initial)
@@ -93,7 +93,7 @@ if __name__ == "__main__":  # confirms that the code is under main function
         new = list(p.map(runInt, datalist))
     # test = list(map(runInt, bound))
     # print(test)
-    sheetname = 'maxWidthIntTest'
+    sheetname = 'testInitialcondSim'
     #print(bound)
     pd.concat(new).to_csv(sheetname+'.csv')
     new = pd.read_csv(sheetname+'.csv').set_index('index').sort_index()

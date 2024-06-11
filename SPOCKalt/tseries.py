@@ -92,3 +92,30 @@ def get_tseries(sim, args):
     return triotseries, stable
 
 
+def initial_cond(sim,args):
+    '''gets the feature list for only initial condition systems.
+    
+    Arguments:
+        sim: simulation in question
+        args: arguments in format [number of orbits, number of data collections equally spaced, list of trios], most of which is irelivant
+            but included for consistancy'''
+    Norbits = args[0] #number of orbits
+    Nout = args[1] #number of data collection
+    trios = args[2] #list of each planet set trio
+
+    triotseries: list[features.initialTrio] =[]
+    #forms the list that will later consist of each trio pair, and the tseries for each list
+    #print(trios)
+    for tr, trio in enumerate(trios): # For each trio there are two adjacent pairs 
+        #fills triopairs with each pair, and fills triotseries with the Trio class 
+        #eachpair = get_pairs(sim, trio)
+        #triopairs.append(eachpair)
+        triotseries.append(features.initialTrio())
+        
+        #print(trio)
+        triotseries[tr].initial_features(sim, get_pairs(sim,trio), trio) #puts in the valeus that depend on initial cond
+    return triotseries, True
+
+
+
+

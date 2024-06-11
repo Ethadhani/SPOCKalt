@@ -42,7 +42,7 @@ class FeatureClassifier:
 
 
     
-    def simToData(self, sim):
+    def simToData(self, sim, initialOnly=False):
         '''given a simulation, or list of simulations, returns data required for spock clasification.
         
             Arguments: sim --> simulation or list of simulations
@@ -61,6 +61,32 @@ class FeatureClassifier:
             raise ValueError("If running over many sims at once, they must have the same number of particles")
         
         results = [] #results of the intigrations for each, if only one simulation return will not be in a list
+
+
+        if initialOnly == True:
+            for s in sim:
+                s = s.copy() #creates a copy as to not alter simulation
+                simsetup.init_sim_parameters(s) #initializes the simulation
+                self.check_errors(s) #checks for errors
+                trios = [[j,j+1,j+2] for j in range(1,s.N_real-2)] # list of adjacent trios   
+                featureargs = [Norbits, Nout, trios] #featureargs is: [number of orbits, number of stops, set of trios]
+                trioseries, stable = tseries.initial_cond(s,featureargs)
+                datalist = []
+                for each in trioseries:
+                    datalist.append(each.features)
+                datalist.append(stable)
+                results.append(datalist)
+            return results
+
+
+                
+
+
+                
+
+
+
+        #for intigrated systems
         for s in sim:
             s = s.copy() #creates a copy as to not alter simulation
             simsetup.init_sim_parameters(s) #initializes the simulation

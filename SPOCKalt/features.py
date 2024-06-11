@@ -8,29 +8,10 @@ class Trio:
         
         '''
     #innitialize running list 
-    #delete all outers
         self.runningList = OrderedDict()
-        self.runningList['time']=[] #must keep time
-        # self.runningList['EMnear']=[]
-        # self.runningList['EPnear']=[]
-        # self.runningList['EMfar']=[]
-        # self.runningList['EPfar']=[]
-        # self.runningList['EMouter']=[]
-        # self.runningList['EPouter']=[]
-        # self.runningList['MMRstrengthfar']=[]
-        # self.runningList['MMRstrengthnear']=[]
-        # self.runningList['MMRstrengthouter']=[]
-        # self.runningList['twoMMRstrengthfar']=[]
-        # self.runningList['twoMMRstrengthnear']=[]
-        # self.runningList['twoMMRstrengthouter']=[]
+        self.runningList['time']=[]
         self.runningList['MEGNO']=[]
         self.runningList['threeBRfill']=[]
-        # self.runningList['MMRstrengthWnear']=[]
-        # self.runningList['MMRstrengthWfar']=[]
-        # self.runningList['MMRstrengthWouter']=[]
-        # self.runningList['MMRinWidnear']=[]
-        # self.runningList['MMRinWidfar']=[]
-        # self.runningList['MMRinWidouter']=[]
         for each in ['near','far','outer']:
             self.runningList['EM'+each]=[]
             self.runningList['EP'+each]=[]
@@ -40,38 +21,9 @@ class Trio:
             self.runningList['MMRinWid'+each]=[]
             self.runningList['twoMMRstrengthW'+each]=[]
             self.runningList['twoMMRinWid'+each]=[]
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-    #innitialize final values
-    #delete all outers
+    #returned features
         self.features = OrderedDict()
-        # self.features['EMcrossnear']= np.nan
-        # self.features['EMfracstdnear']= np.nan
-        # self.features['EPstdnear']= np.nan
-        # self.features['MMRstrengthnear']= np.nan
-        # self.features['twoMMRstrengthnear']= np.nan
-        # self.features['EMcrossfar']= np.nan
-        # self.features['EMfracstdfar']= np.nan
-        # self.features['EPstdfar']= np.nan
-        # self.features['MMRstrengthfar']= np.nan
-        # self.features['twoMMRstrengthfar']= np.nan
-        # self.features['EMcrossouter']= np.nan
-        # self.features['EMfracstdouter']= np.nan
-        # self.features['EPstdouter']= np.nan
-        # self.features['MMRstrengthouter']= np.nan
-        # self.features['twoMMRstrengthouter']= np.nan
+
         for each in ['near','far','outer']:
             self.features['EMcross'+each]= np.nan
             self.features['EMfracstd'+each]= np.nan
@@ -85,32 +37,11 @@ class Trio:
             self.features['twoMMRstrengthW'+each]=np.nan
             self.features['twoMMRstrengthWMAX'+each]=np.nan
 
-            
-            
-
-
         self.features['MEGNO']= np.nan
         self.features['MEGNOstd']= np.nan
         self.features['threeBRfillfac']= np.nan
         self.features['threeBRfillstd']= np.nan
         self.features['chiSec'] = np.nan
-        
-        #self.features['MMR']= np.nan
-
-
-        
-
-
-
-
-
-
-
-
-
-    
-
-
 
     def fillVal(self, Nout):
         '''fills with nan values
@@ -130,9 +61,8 @@ class Trio:
             user must specify how each is calculated and added
         '''
         ps = sim.particles
-        #print(pairs)
+        
         for q, [label, i1, i2] in enumerate(pairs):
-            #print(q)
             m1 = ps[i1].m
             m2 = ps[i2].m
             e1x, e1y = ps[i1].e*np.cos(ps[i1].pomega), ps[i1].e*np.sin(ps[i1].pomega)
@@ -140,7 +70,6 @@ class Trio:
             self.runningList['time'][i]= sim.t/minP
             self.runningList['EM'+label][i]= np.sqrt((e2x-e1x)**2 + (e2y-e1y)**2)
             self.runningList['EP'+label][i] = np.sqrt((m1*e1x + m2*e2x)**2 + (m1*e1y + m2*e2y)**2)/(m1+m2)
-            #print([label, i1, i2])
             MMRs = find_strongest_MMR(sim, i1, i2)
             self.runningList['MMRstrength'+label][i] = MMRs[2]
             self.runningList['twoMMRstrength'+label][i] = MMRs[6]
@@ -148,16 +77,10 @@ class Trio:
             self.runningList['MMRstrengthW'+label][i]=MMRW[0]
             self.runningList['MMRinWid'+label][i]=MMRW[1]
             MMRWtwo = MMRwidth(sim, MMRs[7], i1,i2)
-            #print(MMRs)
             self.runningList['twoMMRstrengthW'+label][i]=MMRWtwo[0]
             self.runningList['twoMMRinWid'+label][i]=MMRWtwo[1]
-            #print(label)
-
         self.runningList['threeBRfill'][i]= threeBRFillFac(sim, trio)
-        self.runningList['MEGNO'][i]= sim.megno() # megno
-    
-
-
+        self.runningList['MEGNO'][i]= sim.megno() 
 
     def startingFeatures(self, sim, pairs):
         '''used to initialize/add to the features that only depend on initial conditions'''
@@ -189,8 +112,6 @@ class Trio:
 
         self.features['chiSec']= chi12/(chi23+chi12)
 
-        
-
     def fill_features(self, args):
         '''fills the final set of features that are returned to the ML model.
             
@@ -220,30 +141,75 @@ class Trio:
             self.features['twoMMRstrengthWMAX'+label]=max(self.runningList['twoMMRstrengthW'+label])
             self.features['MMRinWid'+label]=np.median(self.runningList['MMRinWid'+label])
             self.features['twoMMRinWid'+label]=np.median(self.runningList['twoMMRinWid'+label])
-
-
-
-
-
-
-
-        # self.features['MMRstrengthnear']= np.median(self.runningList['MMRstrengthnear'])
-        # self.features['MMRstrengthfar']= np.median(self.runningList['MMRstrengthfar'])
-        # self.features['twoMMRstrengthnear']= np.median(self.runningList['twoMMRstrengthnear'])
-        # self.features['twoMMRstrengthfar']= np.median(self.runningList['twoMMRstrengthfar'])
-
-        # self.features['EMfracstdnear']= np.std(self.runningList['EMnear'])/ self.features['EMcrossnear']
-        # self.features['EMfracstdfar']= np.std(self.runningList['EMfar'])/ self.features['EMcrossfar']
-        # self.features['EPstdnear']= np.std(self.runningList['EPnear'])
-        # self.features['EPstdfar']= np.std(self.runningList['EPfar'])
        
+
+
+
+class initialTrio:
+    def __init__(self):
+        self.features = OrderedDict()
+
+        for each in ['near','far','outer']:
+            self.features['EMcross'+each]= np.nan
+            self.features['MMRstrength'+each]= np.nan
+            self.features['twoMMRstrength'+each]= np.nan
+            self.features['MMRinWid'+each]=np.nan
+            self.features['MMRstrengthW'+each]=np.nan
+            #self.features['MMRstrengthWMAX'+each]=np.nan
+            self.features['twoMMRinWid'+each]=np.nan
+            self.features['twoMMRstrengthW'+each]=np.nan
+            #self.features['twoMMRstrengthWMAX'+each]=np.nan
+
+        self.features['MEGNO']= np.nan
+        self.features['threeBRfillfac']= np.nan
+        self.features['chiSec'] = np.nan
+
+    def initial_features(self,sim, pairs, trio):
+        '''used to initialize/add to the features that only depend on initial conditions'''
         
-    
+        #only applies to one
+        ps  = sim.particles
+        for [label, i1, i2] in pairs:
+            self.features['EMcross'+label] =  (ps[i2].a-ps[i1].a)/ps[i1].a
+            m1 = ps[i1].m
+            m2 = ps[i2].m
+            e1x, e1y = ps[i1].e*np.cos(ps[i1].pomega), ps[i1].e*np.sin(ps[i1].pomega)
+            e2x, e2y = ps[i2].e*np.cos(ps[i2].pomega), ps[i2].e*np.sin(ps[i2].pomega)
+            self.features['EM'+label]= np.sqrt((e2x-e1x)**2 + (e2y-e1y)**2)
+            self.features['EP'+label] = np.sqrt((m1*e1x + m2*e2x)**2 + (m1*e1y + m2*e2y)**2)/(m1+m2)
+            MMRs = find_strongest_MMR(sim, i1, i2)
+            self.features['MMRstrength'+label] = MMRs[2]
+            self.features['twoMMRstrength'+label] = MMRs[6]
+            MMRW = MMRwidth(sim, MMRs[3], i1,i2)
+            self.features['MMRstrengthW'+label]=MMRW[0]
+            self.features['MMRinWid'+label]=MMRW[1]
+            MMRWtwo = MMRwidth(sim, MMRs[7], i1,i2)
+            self.features['twoMMRstrengthW'+label]=MMRWtwo[0]
+            self.features['twoMMRinWid'+label]=MMRWtwo[1]
+        
+        self.features['threeBRfillfac']= threeBRFillFac(sim, trio)
+        self.features['MEGNO']= sim.megno() 
 
+         #FIXME
+        #this wont work for abstracted data but will be used for testing purposes
+        #from Eritas&Tamayo 2024
 
+        #equation 11
+        e12 = 1- (ps[1].a/ps[2].a)
+        e13 = 1- (ps[1].a/ps[3].a)
+        e23 = 1- (ps[2].a/ps[3].a)
 
+        #23
+        eta = (e12/e13)-(e23/e13)
 
+        #equation 25
 
+        mu = (ps[3].m-ps[1].m)/(ps[1].m+ps[3].m)
+        chi23 = (1+eta)**3 *(3-eta)*(1+mu)
+        chi12 = (1-eta)**3 *(3+eta)*(1-mu)
+
+        self.features['chiSec']= chi12/(chi23+chi12)
+        
 
 
 
@@ -280,12 +246,6 @@ def MMRwidth(sim,Prat, i1,i2):
     
 
     return scaleWidth, inwidth
-
-
-
-
-
-
 
 
 def threeBRFillFac(sim, trio):
@@ -331,6 +291,7 @@ def threeBRFillFac(sim, trio):
 
 
     ######################### Taken from celmech github.com/shadden/celmech
+
 def farey_sequence(n):
     """Return the nth Farey sequence as order pairs of the form (N,D) where `N' is the numerator and `D' is the denominator."""
     a, b, c, d = 0, 1, 1, n
@@ -340,6 +301,7 @@ def farey_sequence(n):
         a, b, c, d = c, d, (k*c-a), (k*d-b)
         sequence.append( (a,b) )
     return sequence
+
 def resonant_period_ratios(min_per_ratio,max_per_ratio,order):
     """Return the period ratios of all resonances up to order 'order' between 'min_per_ratio' and 'max_per_ratio' """
     if min_per_ratio < 0.:
@@ -419,10 +381,3 @@ def find_strongest_MMR(sim, i1, i2):
 
 def swap(a,b):
     return b,a
-
-
-
-
-#def createFeatures(sim, n_jobs=-1):
-
-
